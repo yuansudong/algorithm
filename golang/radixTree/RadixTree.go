@@ -34,9 +34,43 @@ func createSubTree(curHigh int, totalHigh int, parent *radixTreeNode) {
 
 // Put 用于向RaidxTree中放置一个key-val 结构体,如果该key存在则覆盖,如果不存在则添加
 func (rt *RadixTree) Put(key string, value interface{}) bool {
-	if radixTreeNode
+	KeyLen := len(key)
+	if KeyLen >= rt.high {
+		return false
+	}
+	DestinationNode := getRadixTreeNode(0, KeyLen, key, rt.root)
+	if DestinationNode == nil {
+		return false
+	}
+	DestinationNode.data = value
+	return true
+}
 
-	getRadixTreeNode(0, len(key), key, rt.root)
+// Delete 用于删除一个key
+func (rt *RadixTree) Delete(key string) bool {
+	KeyLen := len(key)
+	if KeyLen >= rt.high {
+		return false
+	}
+	DestinationNode := getRadixTreeNode(0, KeyLen, key, rt.root)
+	if DestinationNode == nil {
+		return false
+	}
+	DestinationNode.data = nil
+	return true
+}
+
+// Get 用于得到一个key的值
+func (rt *RadixTree) Get(key string) interface{} {
+	KeyLen := len(key)
+	if KeyLen >= rt.high {
+		return nil
+	}
+	DestinationNode := getRadixTreeNode(0, KeyLen, key, rt.root)
+	if DestinationNode == nil {
+		return nil
+	}
+	return DestinationNode.data
 }
 
 func getRadixTreeNode(Index int, Length int, Key string, Node *radixTreeNode) *radixTreeNode {
