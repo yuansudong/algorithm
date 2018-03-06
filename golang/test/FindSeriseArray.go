@@ -58,8 +58,7 @@ func FindSumMaxArray(Array []int, low int, high int) (int, int, int) {
 }
 
 func main() {
-	slice := []int{-1, 2, -10, -100, 100, 900, -128, 800, 700}
 
-	fmt.Println(FindSumMaxArray(slice, 0, len(slice)-1))
-
+	var pointer *int
+	fmt.Println(pointer == nil)
 }
