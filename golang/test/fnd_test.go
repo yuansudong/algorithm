@@ -2,6 +2,7 @@ package main
 
 import (
 	"SDAlgorithm/golang/brtree"
+	"math/rand"
 	"strconv"
 	"testing"
 )
@@ -31,4 +32,16 @@ func Benchmark_Get(B *testing.B) {
 	}
 	B.StartTimer()
 	brtree.Get(BRT, "51452")
+}
+
+func Benchmark_slice(B *testing.B) {
+	B.StopTimer()
+	slice := make([]int, 100000000)
+	for i := 0; i < B.N; i++ { //use b.N for looping
+		j := rand.Intn(len(slice) - 1)
+		B.StartTimer()
+		slice = append(slice[:j], slice[j+1:]...)
+		B.StopTimer()
+	}
+
 }
