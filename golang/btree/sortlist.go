@@ -1,69 +1,75 @@
 package btree
 
-type (
-	// ListNode 表示结点元素
-	ListNode struct {
-		data *Element
-		next *ListNode
-	}
-	// SortList 表示一个双向链表
-	SortList struct {
-		head    *ListNode
-		compare func(*Element, *Element) int
-		len     uint
-	}
-)
-
-// CreateListNode 用于创建一个链表结点
-func CreateListNode(Ele *Element) *ListNode {
-	return &ListNode{
-		data: Ele,
-		next: nil,
-	}
+// SortList 有序列表
+type SortList struct {
+	len  int
+	head *SortListNode
 }
 
 // CreateSortList 用于创建一个有序的列表
-func CreateSortList(Compare func(*Element, *Element) int) *SortList {
-	PList := &SortList{
-		len:     0,
-		compare: Compare,
-		head:    CreateListNode(nil),
-	}
-	return PList
+func CreateSortList() *SortList {
+	PSortList := new(SortList)
+	PSortList.len = 0
+	PSortList.head = new(SortListNode)
+	return PSortList
 }
 
-// Insert 用于向一个有序链表中插入
-func (SL *SortList) Insert(InsertElement *Element) {
-	PNewNode := CreateListNode(InsertElement)
-	PInsertNode := SL.head.next
-	PInsertNodePrev := SL.head
-	for PInsertNode != nil {
-		if SL.compare(PNewNode.data, PInsertNode.data) == -1 {
-
-			break
-		}
-		PInsertNodePrev = PInsertNode
-		PInsertNode = PInsertNode.next
-	}
-	PNewNode.next = PInsertNodePrev.next
-	PInsertNodePrev.next = PNewNode
-	SL.len = SL.len + 1
+// SortListNode 用于表示list的结点
+type SortListNode struct {
+	key        BKey
+	value      interface{}
+	prev, next *SortListNode
 }
 
-// Delete 用于删除指定的元素
-func (SL *SortList) Delete(Ele *Element) *ListNode {
-	PIterator := SL.head.next
-	PIteratorPrev := SL.head
-	for PIterator != nil {
-		if SL.compare(PIterator.data, Ele) == 0 {
-			PIteratorPrev.next = PIterator.next
-			SL.len = SL.len - 1
+// Update 用于向有序列表中增加或者更新一个元素,且Key互斥
+func (L *SortList) Update(Key *BKey, Value interface{}) {
+	PHead := L.head.next
+	PPrev := L.head
+	var CompareRet int
+	for PHead != nil {
+		CompareRet = PHead.key.compare(Key)
+		if CompareRet == 1 {
+			break
+		} else if CompareRet == 0 {
+			PHead.value = Value
+			return
+		}
+		PPrev = PHead
+		PHead = PHead.next
+	}
+	PNewSortListNode := new(SortListNode)
+	PNewSortListNode.key = *Key
+	PNewSortListNode.value = Value
+	// 如果满足条件则代表是在尾部结点插入
+	PPrev.next = PNewSortListNode
+	PNewSortListNode.next = PHead
+	PNewSortListNode.prev = PPrev
+	if PHead != nil {
+		PHead.prev = PNewSortListNode
+	}
+	L.len++
+
+}
+
+// Delete 用于删除指定的Key
+func (L *SortList) Delete(Key *BKey) {
+	PHead := L.head.next
+	PPrev := L.head
+	var CompareRet int
+	for PHead != nil {
+		CompareRet = PHead.key.compare(Key)
+		if CompareRet == 0 {
 			break
 		}
-		PIteratorPrev = PIterator
-		PIterator = PIterator.next
+		PPrev = PHead
+		PHead = PHead.next
 	}
-	return PIterator
-}                         
-
-//   GetIndex
+	// 如果满足条件则代表是在尾部结点插入
+	if PHead != nil {
+		PPrev.next = PHead.next
+		if PHead.next != nil {
+			PHead.next.prev = PPrev
+		}
+		L.len--
+	}
+}
